@@ -15,12 +15,12 @@ BEGIN
   END IF;
 END $$;
 
--- Add the correct unique constraint if missing
+-- Add the correct unique constraint if table exists and constraint is missing
 DO $$
 BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_constraint WHERE conname = 'posts_user_id_hour_slot_key'
-  ) THEN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'posts')
+  AND NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'posts_user_id_hour_slot_key')
+  THEN
     ALTER TABLE posts ADD CONSTRAINT posts_user_id_hour_slot_key UNIQUE (user_id, hour_slot);
   END IF;
 END $$;
